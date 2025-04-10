@@ -1,0 +1,517 @@
+/* === 🌌 GLOBAL STYLES === */
+body {
+  margin: 0;
+  background-color: #0a0012;
+  color: #bb88ff;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 15px;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* === 💡 Flash When LOREA Speaks === */
+body.flash {
+  background-color: #8c00ff;
+  transition: background-color 0.05s ease;
+  animation: bodyFlashEffect 0.1s ease-out;
+}
+
+@keyframes bodyFlashEffect {
+  0% {
+    background-color: #ffffff;
+    filter: brightness(200%) contrast(100%);
+  }
+  100% {
+    background-color: #0a0012;
+    filter: brightness(100%) contrast(100%);
+  }
+}
+
+
+/* === 🖥️ Terminal Container === */
+.terminal-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  background: #050011;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* === 📜 Terminal Output Scrollable Area === */
+.terminal-output {
+  flex-grow: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  line-height: 0.9;
+  animation: flicker 0.12s infinite alternate;
+  z-index: 1;
+}
+
+.center-output {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+/* === 🤖 LOREA Thinking Text === */
+.lorea {
+  font-size: 1.2rem;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 0 4px #cc66ff, 0 0 8px #8800cc;
+  animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* === ⌨️ Command Prompt Blinker === */
+.prompt {
+  color: #e0aaff;
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* === ✨ Ambient Flicker === */
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  5% { opacity: 1; }
+  10% { opacity: 0.93; }
+  20% { opacity: 0.99; }
+  30% { opacity: 0.96; }
+  100% { opacity: 1; }
+}
+
+/* === 🧠 LOREA Glitch Effect Wrap === */
+.glitch p {
+  position: relative;
+  display: block;
+}
+
+.glitch p::before,
+.glitch p::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  background: transparent;
+  clip: rect(0, 900px, 0, 0);
+  opacity: 0.3;
+}
+
+.glitch p::before {
+  animation: glitchTop 1.4s infinite linear alternate-reverse;
+  color: #ff33cc;
+}
+
+.glitch p::after {
+  animation: glitchBot 1.4s infinite linear alternate-reverse;
+  color: #7209d48c;
+}
+
+/* === 🔀 Glitch Animation Frames === */
+@keyframes glitchTop {
+  0% { clip: rect(0, 9999px, 0, 0); }
+  10% { clip: rect(4px, 9999px, 14px, 0); }
+  20% { clip: rect(8px, 9999px, 18px, 0); }
+  30% { clip: rect(3px, 9999px, 9px, 0); }
+  100% { clip: rect(0, 9999px, 0, 0); }
+}
+
+@keyframes glitchBot {
+  0% { clip: rect(0, 9999px, 0, 0); }
+  10% { clip: rect(20px, 9999px, 35px, 0); }
+  20% { clip: rect(15px, 9999px, 25px, 0); }
+  30% { clip: rect(25px, 9999px, 40px, 0); }
+  100% { clip: rect(0, 9999px, 0, 0); }
+}
+
+/* === 🗣️ LOREA Dialogue Pulse === */
+.lorea-speak {
+  color: #e0b3ff;
+  font-weight: bold;
+  text-shadow: 0 0 4px #d17bff, 0 0 8px #6c00cc;
+  animation: pulseGlow 1s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0% {
+    text-shadow: 0 0 4px #d17bff, 0 0 8px #6c00cc;
+    opacity: 0.9;
+  }
+  50% {
+    text-shadow: 0 0 6px #f0c2ff, 0 0 12px #7a00ff;
+    opacity: 1;
+  }
+  100% {
+    text-shadow: 0 0 4px #d17bff, 0 0 8px #6c00cc;
+    opacity: 0.9;
+  }
+}
+
+/* === ▋ Terminal Cursor === */
+.cursor {
+  display: inline-block;
+  width: 1ch;
+  animation: blink 1s steps(1) infinite;
+  color: #38005e;
+}
+
+.typing-line {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  /* REMOVE the border-right */
+  /* border-right: 1px solid #e0b3ff; */
+  width: 0;
+  animation: typewriter 2.5s steps(30, end) forwards;
+  font-family: 'Courier New', monospace;
+  margin-top: 0.5rem;
+  color: #4b007c;
+  text-shadow: 0 0 2px #240038;
+}
+
+
+.typing-line.slower {
+  animation: typewriter 4.5s steps(35, end) forwards;
+}
+
+@keyframes typewriter {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+/* === 🌫️ Subtle Breathing Pulse === */
+.terminal-screen.thinking {
+  animation: loreaPulse 3s ease-in-out infinite;
+}
+
+@keyframes loreaPulse {
+  0%   { background-color: #050011; }
+  50%  { background-color: #0a001a; }
+  100% { background-color: #050011; }
+}
+
+/* === ⚡ Enhanced Glitch Text Style === */
+.glitch-text {
+  position: relative;
+  color: #e0b3ff;
+  font-weight: bold;
+  text-shadow: 0 0 3px #6c00cc, 0 0 6px #e0b3ff;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  opacity: 0.3;
+  mix-blend-mode: lighten;
+}
+
+.glitch-text::before {
+  color: #ff33cc;
+  top: -1px;
+  left: 2px;
+  animation: glitchTop 0.8s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+  color: #66ffff;
+  top: 1px;
+  left: -2px;
+  animation: glitchBot 0.8s infinite linear alternate-reverse;
+}
+
+/* === ✨ Flash Pulse After Speaking === */
+.glitch-flash {
+  animation: flashPulse 0.1s ease-out;
+}
+
+@keyframes flashPulse {
+  0%   { filter: brightness(200%) contrast(180%); }
+  50%  { filter: brightness(130%) contrast(130%); }
+  100% { filter: brightness(100%) contrast(100%); }
+}
+
+/* === 📺 CRT Scanline + Flicker Overlay === */
+.terminal-screen::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%; width: 100%;
+  pointer-events: none;
+  background: rgba(225, 0, 255, 0.02);
+  mix-blend-mode: overlay;
+  animation: screenFlicker 0.3s infinite;
+  z-index: 2;
+}
+
+@keyframes screenFlicker {
+  0%   { opacity: 0.01; }
+  5%   { opacity: 0.03; }
+  10%  { opacity: 0.015; }
+  20%  { opacity: 0.04; }
+  30%  { opacity: 0.01; }
+  70%  { opacity: 0.025; }
+  100% { opacity: 0.01; }
+}
+
+.terminal-screen::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%; width: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(155, 3, 3, 0.04),
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 5px,
+    transparent 2px
+  );
+  mix-blend-mode: hard-light;
+  opacity: 40;
+  z-index: 1;
+}
+
+/* === 💻 App Wrapper === */
+.app-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* === 🧊 Startup Fade Flash === */
+.screen-on-overlay {
+  position: absolute;
+  z-index: 100;
+  background: rgb(0, 0, 0);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  animation: screenOnStartup 4s ease-out forwards;
+}
+
+@keyframes screenOnStartup {
+  0% {
+    transform: scaleY(0.02);
+    background-color: #030000;
+    opacity: 1;
+    filter: brightness(800%) blur(6px);
+  }
+  3% {
+    transform: scaleY(0.2);
+    background-color: #ffffff;
+    opacity: 1;
+    filter: brightness(300%) blur(2px);
+  }
+  12% {
+    transform: scaleY(1.1);
+    background-color: #000000;
+    opacity: 0.7;
+    filter: brightness(100%) blur(0px);
+  }
+  60% {
+    transform: scaleY(1);
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(1);
+    display: none;
+  }
+}
+
+/* === 🆘 No Signal Glitch Text === */
+.no-signal-glitch {
+  position: absolute;
+  z-index: 200;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ff000d8a;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  opacity: 1;
+  animation: noSignalFlicker 3.2s ease-out forwards;
+  text-shadow: 0 0 5px #ea00ff67, 0 0 10px #ff00bf54;
+  pointer-events: none;
+}
+
+@keyframes noSignalFlicker {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  20% { opacity: 0.6; }
+  30% { opacity: 0.9; }
+  50% { opacity: 0.2; }
+  70% { opacity: 0.8; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* === ✨ Initial Glow After Startup === */
+.glow-start {
+  animation: greenPhosphorGlow 2s ease-in;
+}
+
+@keyframes greenPhosphorGlow {
+  0% {
+    filter: brightness(140%) drop-shadow(0 0 8px #00ffcc);
+  }
+  100% {
+    filter: brightness(100%) drop-shadow(0 0 0px transparent);
+  }
+}
+
+/* === 🕵️ Hide Terminal Until Boot === */
+.hidden-terminal {
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* === 📡 Vertical Sync Scroll Effect === */
+.vertical-sync {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 101;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.02) 0px,
+    rgba(255, 255, 255, 0.02) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  animation: syncScroll 1.5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes syncScroll {
+  0% {
+    background-position-y: 0;
+  }
+  100% {
+    background-position-y: 100%;
+  }
+}
+
+/* === 🔄 Dots Loading === */
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  animation: fadeIn 1s ease-in;
+}
+
+.loading-dots span {
+  width: 10px;
+  height: 10px;
+  margin: 0 5px;
+  background: #8c00ff;
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: pulseDot 1.2s infinite;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
+/* === 🧠 LOREA Matrix Online Notice (Soft Glow) === */
+.matrix-online-flash {
+  position: absolute;
+  z-index: 999;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #6c00cc;
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  white-space: nowrap; /* 🧠 Prevents line breaks */
+  text-shadow: 0 0 4px #3600cc, 0 0 8px #6c00cc;
+  pointer-events: none;
+  animation: matrixSoftReveal 1.5s ease-out forwards, matrixTear 0.3s steps(2, end);
+}
+
+/* Soft pulse reveal */
+@keyframes matrixSoftReveal {
+  0% {
+    opacity: 0;
+    filter: brightness(140%) blur(1px);
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(160%) blur(0.5px);
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(100%) blur(0);
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Quick glitch tear */
+@keyframes matrixTear {
+  0%, 100% {
+    clip-path: inset(0% 0% 0% 0%);
+  }
+  50% {
+    clip-path: inset(40% 0% 40% 0%);
+  }
+}
+/* === 💥 Flash after "Impossible" === */
+.line-flash {
+  animation: flashPulse 0.3s ease-out;
+}
+
+@keyframes flashPulse {
+  0% {
+    filter: brightness(220%) contrast(180%);
+    transform: scale(1.6);
+  }
+  50% {
+    filter: brightness(130%) contrast(140%);
+    transform: scale(0.99);
+  }
+  100% {
+    filter: brightness(100%) contrast(100%);
+    transform: scale(2);
+  }
+}
