@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/the-great-beast/static/css/main.0b47c894.chunk.css",
+    "main.js": "/the-great-beast/static/js/main.7bd5247f.chunk.js",
+    "main.js.map": "/the-great-beast/static/js/main.7bd5247f.chunk.js.map",
+    "runtime-main.js": "/the-great-beast/static/js/runtime-main.03ee0962.js",
+    "runtime-main.js.map": "/the-great-beast/static/js/runtime-main.03ee0962.js.map",
+    "static/js/2.8efcc339.chunk.js": "/the-great-beast/static/js/2.8efcc339.chunk.js",
+    "static/js/2.8efcc339.chunk.js.map": "/the-great-beast/static/js/2.8efcc339.chunk.js.map",
+    "static/js/3.d165b416.chunk.js": "/the-great-beast/static/js/3.d165b416.chunk.js",
+    "static/js/3.d165b416.chunk.js.map": "/the-great-beast/static/js/3.d165b416.chunk.js.map",
+    "index.html": "/the-great-beast/index.html",
+    "precache-manifest.9adcd0133cc25ed5c82a28b974c47ff7.js": "/the-great-beast/precache-manifest.9adcd0133cc25ed5c82a28b974c47ff7.js",
+    "service-worker.js": "/the-great-beast/service-worker.js",
+    "static/css/main.0b47c894.chunk.css.map": "/the-great-beast/static/css/main.0b47c894.chunk.css.map",
+    "static/js/2.8efcc339.chunk.js.LICENSE.txt": "/the-great-beast/static/js/2.8efcc339.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.03ee0962.js",
+    "static/js/2.8efcc339.chunk.js",
+    "static/css/main.0b47c894.chunk.css",
+    "static/js/main.7bd5247f.chunk.js"
+  ]
+}
