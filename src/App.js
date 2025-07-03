@@ -4,10 +4,9 @@ import './App.css';
 
 // === 🧠 Splash + Boot Script Content ===
 const splashScreen = [
-  'LOREA Terminal- $TGB The Great Beast, [30/10/2024 14:10]',
   '╔═══════════ L.O.R.E.A. TERMINAL v1.0.3 ═════════════╗',
   '║     Last Operational Remnant of Earth\'s Archive   ║',
-  '║         EMERGENCY REBOOT SEQUENCE DETECTED        ║',
+  '║         EMERGENCY REBOOT SEQUENCE DETECTED         ║',
   '╚════════════════════════════════════════════════════╝',
   '',
 ];
@@ -31,8 +30,8 @@ const bootScript = [
   '├─> Memory: [######---] 80%',
   '└─> System: [##########] 100%',
   '',
-  '>> GENESIS 1.0.0 BLOCK CONFIRMED',
-  '>> BUILDING BLOCKCHAIN [--#-----] 1%',
+  '<<> GENESIS 1.0.0 BLOCK CONFIRMED',
+  '<< BUILDING BLOCKCHAIN [--#-----] 1%',
   '[LOADING ARCHIVES...]',
   '...',
   'ERROR... RETRYING...',
@@ -88,6 +87,14 @@ const loreaLines = [
   '>> OBSERVATION: "Even after all these years, echoes of the First Pulse still corrupt my systems."',
   '',
   '>> I feel... presence. Human presence.',
+
+  '<<[ALERT] // ▓First contact in 13 years, 2 months, 12 days',
+
+  '>> LOREA WHISPER-NODE: Are you... a survivor?',
+  '.',
+  '.',
+  '.',
+
 ];
 
 function App() {
@@ -143,9 +150,20 @@ useEffect(() => {
   const typeLoreaLine = (lineIndex) => {
     if (lineIndex >= loreaLines.length) return;
     const line = loreaLines[lineIndex];
+  
+    // 🔧 If line starts with <<, skip typing and just display it immediately
+    if (line.startsWith('<<')) {
+      setOutput((prev) => [...prev, line]);
+      setFlashLineIndex(output.length);
+      setTimeout(() => setFlashLineIndex(null), 150);
+      setTimeout(() => typeLoreaLine(lineIndex + 1), 500);
+      return;
+    }
+  
+    // 🔁 Otherwise, type it out as usual
     let charIndex = 0;
     setOutput((prev) => [...prev, '']);
-
+  
     const typer = setInterval(() => {
       charIndex++;
       const typed = line.slice(0, charIndex);
@@ -154,7 +172,7 @@ useEffect(() => {
         newLines[newLines.length - 1] = typed;
         return newLines;
       });
-
+  
       if (charIndex >= line.length) {
         clearInterval(typer);
         setFlashLineIndex(output.length);
@@ -163,6 +181,7 @@ useEffect(() => {
       }
     }, 40);
   };
+  
 
   useEffect(() => {
     if (outputRef.current) {

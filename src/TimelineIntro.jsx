@@ -1,3 +1,4 @@
+
 /* eslint-disable no-unused-expressions */
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import './timelineIntro.css';
@@ -29,7 +30,7 @@ const TimelineIntro = ({ onComplete }) => {
   const [currentEntry, setCurrentEntry] = useState(0);
   const [dateTyping, setDateTyping] = useState('');
   const [textTyping, setTextTyping] = useState('');
-  const [specialStarState, setSpecialStarState] = useState('pulsing');
+  const [specialStarState, setSpecialStarState] = useState('pulsing'); // 🌟 default
   const [wowSignal, setWowSignal] = useState(false);
   const [triggerEnd, setTriggerEnd] = useState(false);
 
@@ -46,48 +47,37 @@ const TimelineIntro = ({ onComplete }) => {
 
   const intervalsRef = useRef([]);
 
+  // ✨ Typing and entry display logic
   useEffect(() => {
     if (triggerEnd) return;
 
     if (currentEntry >= timelineEntries.length) {
-      setSpecialStarState('flash');
+      setSpecialStarState('faded'); // 💫 fade star at the end
       setTriggerEnd(true);
-    
+
       const container = document.querySelector('.timeline-container');
-    
-      // Begin slow fade to black
-      if (container) {
-        container.classList.add('fading');
-      }
-    
-      // At 5s: flash, tear, star fade
+      if (container) container.classList.add('fading');
+
       setTimeout(() => {
-        setSpecialStarState('faded');
-    
+        setSpecialStarState('faded'); // 🔁 Redundant but safe
+
         if (container) {
-          container.classList.add('flash-frame');       // 💥 quick white flash
-          container.classList.add('screen-tear');       // ⚡ vertical glitch
-          container.classList.add('horizontal-glitch'); // 🔊 horizontal wobble
-        }
-    
-        // Remove the flash quickly so it’s just a blink
-        setTimeout(() => {
-          if (container) {
+          container.classList.add('flash-frame');
+          container.classList.add('screen-tear');
+          container.classList.add('horizontal-glitch');
+
+          setTimeout(() => {
             container.classList.remove('flash-frame');
-          }
-        }, 200); // Flash lasts 150ms
+          }, 200);
+        }
       }, 5000);
-    
-      // At 15s: End timeline
+
       setTimeout(() => {
         onComplete?.();
       }, 20000);
-    
+
       return;
     }
-    
-    
-    
 
     const entry = timelineEntries[currentEntry];
     setDateTyping('');
@@ -123,34 +113,48 @@ const TimelineIntro = ({ onComplete }) => {
       intervalsRef.current.push(dateInterval);
     };
 
-    const typeText = () => {
-      const textInterval = setInterval(() => {
-        if (textIndex < entry.text.length) {
-          typedText += entry.text[textIndex++];
-          setTextTyping(typedText);
+ const typeText = () => {
+  const textInterval = setInterval(() => {
+    if (textIndex < entry.text.length) {
+      typedText += entry.text[textIndex++];
+      setTextTyping(typedText);
 
-          if (currentEntry === 1 && typedText.includes("'Wow' signal")) {
-            setWowSignal(true);
-            setTimeout(() => setWowSignal(false), wowSignalDuration);
-          }
+      if (currentEntry === 1 && typedText.includes("'Wow' signal")) {
+        setWowSignal(true);
+        setTimeout(() => setWowSignal(false), wowSignalDuration);
+      }
 
-        } else {
-          clearInterval(textInterval);
-          setTimeout(() => setCurrentEntry(prev => prev + 1), entryDelay);
-        }
-      }, textTypingSpeed);
-      intervalsRef.current.push(textInterval);
-    };
+    } else {
+      clearInterval(textInterval);
+      setTimeout(() => setCurrentEntry(prev => prev + 1), entryDelay);
+    }
+  }, textTypingSpeed);
+  intervalsRef.current.push(textInterval);
+};
+
 
     const initialDelayTimeout = setTimeout(typeDate, initialTypingDelay);
-    
     return () => {
       clearTimeout(initialDelayTimeout);
       clearAllIntervals();
     };
-    
-
   }, [currentEntry, triggerEnd]);
+
+  // ✅ 🟨 NEW: Stop pulsing on "13th September 2020"
+  useEffect(() => {
+    const entry = timelineEntries[currentEntry];
+    if (entry?.date === "13th September 2020") {
+      setSpecialStarState('still');
+    }
+  }, [currentEntry]);
+
+  // ✅ 🟨 NEW: Turn star blue on "22nd September 2020"
+  useEffect(() => {
+    const entry = timelineEntries[currentEntry];
+    if (entry?.date === "22nd September 2020") {
+      setSpecialStarState('blue');
+    }
+  }, [currentEntry]);
 
   return (
     <div className="timeline-container">

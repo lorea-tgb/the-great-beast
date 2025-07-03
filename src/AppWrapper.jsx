@@ -3,8 +3,10 @@ import App from './App';
 import IntroSequence from './IntroSequence';
 import TimelineIntro from './TimelineIntro';
 
+
 export default function AppWrapper() {
-  const [phase, setPhase] = useState('timeline');
+ const [phase, setPhase] = useState('app');
+
 
   useEffect(() => {
     const handleKey = (e) => {

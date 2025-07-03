@@ -32,7 +32,7 @@ body.flash {
 .terminal-screen {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100svh; /* <--- safer for mobile */
   width: 100vw;
   position: relative;
   background: #050011;
@@ -40,6 +40,7 @@ body.flash {
   box-sizing: border-box;
   overflow: hidden;
 }
+
 
 /* === 📜 Terminal Output Scrollable Area === */
 .terminal-output {
@@ -49,7 +50,9 @@ body.flash {
   line-height: 0.9;
   animation: flicker 0.12s infinite alternate;
   z-index: 1;
+  padding-bottom: 4rem; /* 👈 add this */
 }
+
 
 .center-output {
   align-items: center;
