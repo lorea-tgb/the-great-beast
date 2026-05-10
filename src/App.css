@@ -2548,3 +2548,183 @@ body {
     font-size: 10.5px;
   }
 }
+/* === MOBILE PORTRAIT FIELD TERMINAL MODE === */
+
+@media (max-width: 700px) {
+  :root {
+    --screen-width: 100vw;
+    --terminal-text-width: 62ch;
+    --terminal-bottom-gap: 3.2rem;
+  }
+
+  body {
+    font-size: 10.5px;
+  }
+
+  .app-container {
+    width: 100vw;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .cinematic-intro,
+  .terminal-screen,
+  .screen-on-overlay,
+  .vertical-sync {
+    width: 100vw;
+    height: 100dvh;
+  }
+
+  .terminal-screen {
+    background:
+      radial-gradient(circle at center, rgba(60, 0, 95, 0.28), transparent 58%),
+      linear-gradient(180deg, #05000c 0%, #020005 62%, #000001 100%);
+
+    box-shadow:
+      inset 12px 0 34px rgba(0, 0, 0, 0.92),
+      inset -12px 0 34px rgba(0, 0, 0, 0.92),
+      inset 0 0 62px rgba(80, 0, 120, 0.2);
+  }
+
+  .terminal-output {
+    top: 0.75rem;
+    left: 0.9rem;
+    right: 0.65rem;
+    bottom: var(--terminal-bottom-gap);
+    padding-right: 0.55rem;
+  }
+
+  .terminal-text-column {
+    width: var(--terminal-text-width);
+    max-width: 100%;
+  }
+
+  .terminal-output p {
+    line-height: 1.05;
+    letter-spacing: 0.015em;
+  }
+
+  .terminal-screen::before {
+    opacity: 0.45;
+  }
+
+  .terminal-screen::after {
+    opacity: 0.85;
+  }
+
+  .terminal-hud-right {
+    display: none;
+  }
+
+  .terminal-status-bar {
+    left: 0.45rem;
+    right: 0.45rem;
+    bottom: 0.45rem;
+    height: 1.25rem;
+    font-size: 0.48rem;
+    letter-spacing: 0.08em;
+    gap: 0.35rem;
+    padding: 0 0.4rem;
+    justify-content: space-between;
+  }
+
+  .terminal-status-bar span:nth-child(2),
+  .terminal-status-bar span:nth-child(3) {
+    display: none;
+  }
+
+  .terminal-status-bar span:first-child,
+  .terminal-status-bar span:last-child {
+    display: inline;
+  }
+
+  .dev-controls {
+    top: 0.55rem;
+    right: 0.55rem;
+    gap: 0.25rem;
+    transform: scale(0.78);
+    transform-origin: top right;
+  }
+
+  .dev-controls button {
+    padding: 0.35rem 0.45rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+  }
+
+  .metric-bar-line {
+    gap: 0.25rem;
+    flex-wrap: wrap;
+  }
+
+  .metric-bar-label {
+    min-width: 9rem;
+  }
+
+  .metric-bar-shell {
+    width: 110px;
+    height: 0.5rem;
+  }
+
+  .metric-bar-percent {
+    min-width: 2.4rem;
+  }
+
+  .single-loader-row {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .single-loader-bar {
+    width: 150px;
+    height: 0.58rem;
+  }
+
+  .matrix-online-flash {
+    width: 92vw;
+    font-size: 0.95rem;
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  .typing-line {
+    max-width: 88vw;
+    font-size: 0.78rem;
+    white-space: normal;
+  }
+
+  .no-signal-glitch {
+    width: 92vw;
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .world-map-panel,
+  .main-menu-panel,
+  .timeline-panel {
+    width: 100%;
+    padding: 0.6rem;
+  }
+
+  .world-map-click-surface {
+    height: 190px;
+  }
+
+  .main-menu-item,
+  .timeline-entry-button {
+    padding: 0.45rem 0.5rem;
+  }
+
+  .main-menu-description,
+  .timeline-entry-subtitle {
+    font-size: 0.6rem;
+  }
+
+  .terminal-input-form {
+    margin-top: 0.55rem;
+  }
+
+  .terminal-input {
+    font-size: 10.5px;
+  }
+}
