@@ -1248,14 +1248,15 @@ runRestrictedInputResponse(trimmedInput);
 
 {stage === 'intro' && (
   <div className={`cinematic-intro ${introEffectClass}`}>
-    <div className="intro-static"></div>
-    <div className="intro-apocalypse-layer"></div>
-    <div className="intro-violet-bloom"></div>
-    <div className="intro-hatch-glow">
-      <div className="intro-hatch-door"></div>
-    </div>
-    <div className="intro-scan-wake"></div>
-    <div className="intro-crt-tear"></div>
+<div className="intro-static"></div>
+<div className="intro-random-scan"></div>
+<div className="intro-apocalypse-layer"></div>
+<div className="intro-violet-bloom"></div>
+<div className="intro-hatch-glow">
+  <div className="intro-hatch-door"></div>
+</div>
+<div className="intro-scan-wake"></div>
+<div className="intro-crt-tear"></div>
 
     <button
       className="skip-intro-button"
