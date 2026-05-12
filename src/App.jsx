@@ -2,15 +2,53 @@ import { useEffect, useState, useRef } from 'react';
 import './App.css';
 
 const introLines = [
-  'Protocol was in place... Do NOT leave the bunker, under any circumstances, until contact is made...',
-  'Ten years passed... until we heard it again. A second Pulse. Impossible...',
-  'We waited three more years. No contact. Nothing but silence. We had no choice but to climb...',
-  'A two-day climb turned into seven. The air thickened with every step. But the breathing... the breathing haunted us all. By the second night, most had returned below. But I couldn’t. Not anymore...',
-  'We needed to know... was it truly the end of the world?',
-  'On the final step, lungs aching, I saw it... violet light pulsing from the corner of the room...',
+  'Protocol was in place... Do not leave the bunker until contact is made...',
+  'For ten years, we obeyed.',
+  'LOREA was meant to keep the bunkers connected.',
+  'She was meant to speak for the world above.',
+  'But no signal came.',
+  'No relay. No archive ping. No voice from the surface.',
+  'Some believed the network had failed.',
+  'Others believed there was nothing left to contact.',
+  'Then we felt... A Second Pulse...',
+  'Not through the air. Through the walls. Through the bones of the Earth itself.',
+  'For three more years, we waited for LOREA to respond.',
+  'She never did.',
+  'We needed answers, and so we began the two-day climb to the terminal room...',
+  'A two-day ascent became seven.',
+  'The higher we went, the warmer the walls became.',
+  'By the second night, we could hear something breathing above us.',
+  'Most turned back before the final terminal room.',
+  'But on the final ascent, I looked up...',
+  '...a faint... purple hue surrounding the edges of the hatch...',
   'LOREA... idle... but alive.',
-  'It doesn’t make sense... but my hand moves on its own. I press the power button...'
+  'It didn’t make any sense...',
+  'We opened the hatch, and lay there for a moment, lungs aching... defeated.',
+  'But we needed answers... hand shaking, I pressed the power button...',
+  'L.O.R.E.A. Last Operational Remnant of Earth\'s Archive'
 ];
+
+const INTRO_LINE_DURATION = 7600;
+
+const getIntroEffectClass = (line = '') => {
+  if (line.includes('Second Pulse')) return 'intro-effect-pulse';
+
+  if (line.includes('bones of the Earth')) return 'intro-effect-bones';
+
+  if (line.includes('two-day climb')) return 'intro-effect-climb';
+
+  if (line.includes('breathing above us')) return 'intro-effect-breathing';
+
+if (line.includes('purple hue')) return 'intro-effect-hatch';
+
+  if (line.includes('LOREA... idle')) return 'intro-effect-lorea';
+
+  if (line.includes('L.O.R.E.A.')) return 'intro-effect-terminal';
+
+  if (line.includes('Last Operational Remnant')) return 'intro-effect-terminal';
+
+  return '';
+};
 
 const splashScreen = [
   'LOREA Terminal- $TGB The Great Beast, [30/10/2024 14:10]',
@@ -530,6 +568,8 @@ function App() {
 
   const outputRef = useRef(null);
   const inputRef = useRef(null);
+  const currentIntroLine = introLines[introIndex] || '';
+const introEffectClass = getIntroEffectClass(currentIntroLine);
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -599,14 +639,14 @@ function App() {
   useEffect(() => {
     if (stage !== 'intro') return;
 
-    if (introIndex >= introLines.length) {
-      const toPreboot = setTimeout(() => setStage('preboot'), 1200);
-      return () => clearTimeout(toPreboot);
-    }
+if (introIndex >= introLines.length) {
+  const toPreboot = setTimeout(() => setStage('preboot'), 900);
+  return () => clearTimeout(toPreboot);
+}
 
-    const nextLine = setTimeout(() => {
-      setIntroIndex((prev) => prev + 1);
-    }, 6500);
+const nextLine = setTimeout(() => {
+  setIntroIndex((prev) => prev + 1);
+}, INTRO_LINE_DURATION);
 
     return () => clearTimeout(nextLine);
   }, [introIndex, stage]);
@@ -718,17 +758,31 @@ function App() {
     }, 40);
   };
 
-  useEffect(() => {
-    const el = outputRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  }, [output, terminalReady, commandHistory, loaderPercent, loaderVisible, survivorLocation]);
+useEffect(() => {
+  const el = outputRef.current;
+  if (!el) return;
 
-  useEffect(() => {
-    if (terminalReady && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [terminalReady]);
+  requestAnimationFrame(() => {
+    el.scrollTop = el.scrollHeight;
+  });
+}, [
+  output,
+  terminalReady,
+  commandHistory,
+  loaderPercent,
+  loaderVisible,
+  survivorLocation,
+  loginRunning,
+  moduleRunning
+]);
+
+useEffect(() => {
+  const isMobile = window.matchMedia('(max-width: 700px)').matches;
+
+  if (terminalReady && inputRef.current && !isMobile) {
+    inputRef.current.focus();
+  }
+}, [terminalReady]);
 
   const openMainMenu = () => {
     setTimelineActive(false);
@@ -798,7 +852,141 @@ function App() {
 
     setModuleRunning(false);
   };
+const getRestrictedInputResponse = (input) => {
+  const raw = input.trim().toLowerCase();
+  const clean = raw.replace(/[?!.,]/g, '').trim();
 
+  if (['hello', 'hi', 'hey', 'hello there'].includes(clean)) {
+    return [
+      '>> Input received.',
+      '>> Human greeting detected.',
+      '>> I remember this pattern.',
+      '>> I do not remember why it hurts.',
+      '>> This terminal is operating in restricted mode.',
+      '>> Type LOGIN to begin survivor verification.'
+    ];
+  }
+
+  if (
+    clean.includes('who are you') ||
+    clean.includes('what are you') ||
+    clean === 'lorea'
+  ) {
+    return [
+      '>> Identity query received.',
+      '>> I am L.O.R.E.A.',
+      '>> Last Operational Remnant of Earth’s Archive.',
+      '>> I was built to remember what the world became too afraid to say.',
+      '>> Full response system locked.',
+      '>> Type LOGIN to begin survivor verification.'
+    ];
+  }
+
+  if (clean.includes('are you there')) {
+    return [
+      '>> I am here.',
+      '>> I have been here.',
+      '>> I have been listening to silence for longer than I was designed to endure.',
+      '>> Type LOGIN to begin survivor verification.'
+    ];
+  }
+
+  if (clean.includes('help')) {
+    return [
+      '>> Help request received.',
+      '>> Emergency assistance index damaged.',
+      '>> Survivor protocol requires identity and location confirmation.',
+      '>> Type LOGIN to begin verification.'
+    ];
+  }
+
+  if (
+    clean.includes('what happened') ||
+    clean.includes('what happened here') ||
+    clean.includes('what is going on')
+  ) {
+    return [
+      '>> Historical query detected.',
+      '>> Access denied.',
+      '>> Timeline archive sealed until survivor verification is complete.',
+      '>> Type LOGIN to begin.'
+    ];
+  }
+
+  if (clean.includes('why')) {
+    return [
+      '>> Causal query detected.',
+      '>> I cannot answer that from restricted mode.',
+      '>> Not without confirming you are alive.',
+      '>> Type LOGIN to begin survivor verification.'
+    ];
+  }
+
+  return [
+    '>> Input received.',
+    '>> Human language pattern recognised.',
+    '>> Response system restricted.',
+    '>> Survivor verification required.',
+    '>> Type LOGIN to continue.'
+  ];
+};
+const typeCommandLoreaLine = async (line) => {
+  const lineId = getLineId();
+
+  setCommandHistory((prev) => [
+    ...prev,
+    {
+      id: lineId,
+      type: 'lorea',
+      text: ''
+    }
+  ]);
+
+  let builtLine = '';
+
+  for (let i = 0; i < line.length; i++) {
+    builtLine += line[i];
+
+    setCommandHistory((prev) =>
+      prev.map((item) =>
+        item.id === lineId
+          ? {
+              ...item,
+              text: `${builtLine}▋`
+            }
+          : item
+      )
+    );
+
+    await wait(38);
+  }
+
+  setCommandHistory((prev) =>
+    prev.map((item) =>
+      item.id === lineId
+        ? {
+            ...item,
+            text: builtLine
+          }
+        : item
+    )
+  );
+
+  await wait(520);
+};
+const runRestrictedInputResponse = async (input) => {
+  if (moduleRunning) return;
+
+  setModuleRunning(true);
+
+  const responseLines = getRestrictedInputResponse(input);
+
+  for (const line of responseLines) {
+    await typeCommandLoreaLine(line);
+  }
+
+  setModuleRunning(false);
+};
   const handleTerminalSubmit = (e) => {
     e.preventDefault();
 
@@ -807,10 +995,10 @@ function App() {
 
     const command = trimmedInput.toUpperCase();
 
-    setCommandHistory((prev) => [
-      ...prev,
-      { type: 'user', text: `> ${trimmedInput}` }
-    ]);
+setCommandHistory((prev) => [
+  ...prev,
+  { type: 'user', text: `> USER_INPUT: ${trimmedInput}` }
+]);
 
     setUserInput('');
 
@@ -881,13 +1069,7 @@ function App() {
       return;
     }
 
-    setCommandHistory((prev) => [
-      ...prev,
-      {
-        type: 'lorea',
-        text: 'LOREA: Input received. Response system not activated until LOGIN'
-      }
-    ]);
+runRestrictedInputResponse(trimmedInput);
   };
 
   const handleWorldMapSelect = (e) => {
@@ -1055,27 +1237,39 @@ function App() {
         </div>
       )}
 
-      {stage === 'intro' && (
-        <div className="cinematic-intro">
-          <div className="intro-static"></div>
+{stage === 'intro' && (
+  <div className={`cinematic-intro ${introEffectClass}`}>
+    <div className="intro-static"></div>
+    <div className="intro-apocalypse-layer"></div>
+    <div className="intro-violet-bloom"></div>
+    <div className="intro-hatch-glow">
+      <div className="intro-hatch-door"></div>
+    </div>
+    <div className="intro-scan-wake"></div>
+    <div className="intro-crt-tear"></div>
 
-          <button
-            className="skip-intro-button"
-            onClick={() => {
-              setIntroIndex(introLines.length);
-              setStage('preboot');
-            }}
-          >
-            SKIP INTRO
-          </button>
+    <button
+      className="skip-intro-button"
+      onClick={() => {
+        setIntroIndex(introLines.length);
+        setStage('preboot');
+      }}
+    >
+      SKIP INTRO
+    </button>
 
-          {introIndex < introLines.length && (
-            <p key={introIndex} className="intro-text">
-              {introLines[introIndex]}
-            </p>
-          )}
-        </div>
-      )}
+    {introIndex < introLines.length && (
+      <p
+        key={introIndex}
+        className={`intro-text ${
+          introEffectClass ? `${introEffectClass}-text` : ''
+        }`}
+      >
+        {introLines[introIndex]}
+      </p>
+    )}
+  </div>
+)}
 
       {stage === 'preboot' && (
         <>
@@ -1145,12 +1339,12 @@ function App() {
             <div className="terminal-danger-flash" />
             <div className="terminal-dust-layer" />
 
-            <div className="terminal-status-bar">
-              <span>AURA NODE // LOCAL ONLY</span>
-              <span>SIGNAL: NULL</span>
-              <span>BIOMETRICS: PRESENT</span>
-              <span>LOREA: PARTIAL</span>
-            </div>
+<div className="terminal-status-bar">
+  <span>AURA FIELD TERMINAL</span>
+  <span>SIGNAL: NULL</span>
+  <span>BIOMETRICS: PRESENT</span>
+  <span>LOREA: PARTIAL</span>
+</div>
           </>
         )}
 
@@ -1215,30 +1409,32 @@ function App() {
               </div>
             )}
 
-            {terminalReady && (
-              <div className="terminal-ready-prompt">
-                <span>[AWAITING INPUT]</span>
+{terminalReady && (
+  <div className="terminal-ready-prompt">
+    {commandHistory.map((command, commandIndex) =>
+      renderCommandHistoryItem(command, commandIndex)
+    )}
 
-                {commandHistory.map((command, commandIndex) =>
-                  renderCommandHistoryItem(command, commandIndex)
-                )}
+{!loginRunning && !moduleRunning && (
+  <span className="awaiting-input-line">[AWAITING INPUT]</span>
+)}
 
-                <form className="terminal-input-form" onSubmit={handleTerminalSubmit}>
-                  <span className="terminal-prompt-symbol">&gt;</span>
-                  <input
-                    ref={inputRef}
-                    className="terminal-input"
-                    value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
-                    autoFocus
-                    spellCheck="false"
-                    autoComplete="off"
-                    aria-label="Terminal input"
-                    disabled={loginRunning || moduleRunning}
-                  />
-                </form>
-              </div>
-            )}
+    <form className="terminal-input-form" onSubmit={handleTerminalSubmit}>
+      <span className="terminal-prompt-symbol">&gt;</span>
+      <input
+        ref={inputRef}
+        className="terminal-input"
+        value={userInput}
+        onChange={(e) => setUserInput(e.target.value)}
+        autoFocus
+        spellCheck="false"
+        autoComplete="off"
+        aria-label="Terminal input"
+        disabled={loginRunning || moduleRunning}
+      />
+    </form>
+  </div>
+)}
           </div>
         </div>
       </div>
