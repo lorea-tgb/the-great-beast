@@ -568,6 +568,7 @@ function App() {
 
   const outputRef = useRef(null);
   const inputRef = useRef(null);
+  const isMobileView = window.matchMedia('(max-width: 700px)').matches;
   const currentIntroLine = introLines[introIndex] || '';
 const introEffectClass = getIntroEffectClass(currentIntroLine);
 
@@ -779,10 +780,18 @@ useEffect(() => {
 useEffect(() => {
   const isMobile = window.matchMedia('(max-width: 700px)').matches;
 
-  if (terminalReady && inputRef.current && !isMobile) {
-    inputRef.current.focus();
+  if (
+    terminalReady &&
+    inputRef.current &&
+    !isMobile &&
+    !loginRunning &&
+    !moduleRunning
+  ) {
+    requestAnimationFrame(() => {
+      inputRef.current.focus();
+    });
   }
-}, [terminalReady]);
+}, [terminalReady, loginRunning, moduleRunning]);
 
   const openMainMenu = () => {
     setTimelineActive(false);
@@ -1416,7 +1425,9 @@ runRestrictedInputResponse(trimmedInput);
     )}
 
 {!loginRunning && !moduleRunning && (
-  <span className="awaiting-input-line">[AWAITING INPUT]</span>
+  <span className="awaiting-input-line">
+    {isMobileView ? '[TAP TO INPUT]' : '[AWAITING INPUT]'}
+  </span>
 )}
 
     <form className="terminal-input-form" onSubmit={handleTerminalSubmit}>
