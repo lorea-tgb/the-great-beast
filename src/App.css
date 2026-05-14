@@ -2130,13 +2130,13 @@ body {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.34rem;
 }
 
 .recovered-timeline-entry {
   display: grid;
-  grid-template-columns: 2.2rem 6.2rem 1fr;
+  grid-template-columns: 2.2rem 6.2rem 1fr auto;
   gap: 0.5rem;
   align-items: center;
   width: 100%;
@@ -2152,7 +2152,7 @@ body {
   box-shadow: inset 0 0 10px rgba(80, 180, 255, 0.06);
 }
 
-.recovered-timeline-entry:hover,
+.recovered-timeline-entry:not(.locked):hover,
 .recovered-timeline-entry.active {
   border-color: rgba(145, 220, 255, 0.42);
   border-left-color: rgba(245, 220, 255, 0.72);
@@ -2162,6 +2162,19 @@ body {
   box-shadow:
     inset 0 0 12px rgba(120, 210, 255, 0.1),
     0 0 10px rgba(120, 210, 255, 0.14);
+}
+
+.recovered-timeline-entry.locked {
+  cursor: not-allowed;
+  opacity: 0.34;
+  filter: saturate(0.55) brightness(0.72);
+  border-left-color: rgba(120, 120, 150, 0.22);
+  background:
+    linear-gradient(90deg, rgba(10, 16, 32, 0.62), rgba(32, 0, 56, 0.14), rgba(5, 0, 14, 0.72));
+}
+
+.recovered-timeline-entry.recovered {
+  border-left-color: rgba(145, 220, 255, 0.26);
 }
 
 .recovered-timeline-number {
@@ -2181,6 +2194,30 @@ body {
   color: rgba(237, 211, 255, 0.9);
   font-size: 0.7rem;
   letter-spacing: 0.08em;
+}
+
+.recovered-timeline-chapter-status {
+  color: rgba(145, 220, 255, 0.58);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-align: right;
+}
+
+.recovered-timeline-entry.recovered .recovered-timeline-chapter-status {
+  color: rgba(145, 220, 255, 0.72);
+  text-shadow: 0 0 6px rgba(80, 190, 255, 0.22);
+}
+
+.recovered-timeline-entry.available .recovered-timeline-chapter-status {
+  color: rgba(235, 205, 255, 0.78);
+  text-shadow:
+    0 0 5px rgba(235, 205, 255, 0.34),
+    0 0 10px rgba(135, 80, 255, 0.22);
+}
+
+.recovered-timeline-entry.locked .recovered-timeline-chapter-status {
+  color: rgba(130, 125, 150, 0.5);
+  text-shadow: none;
 }
 
 .recovered-timeline-output {
@@ -3127,6 +3164,7 @@ body {
   .recovered-timeline-number,
   .recovered-timeline-date,
   .recovered-timeline-title,
+  .recovered-timeline-chapter-status,
   .recovered-timeline-status,
   .recovered-timeline-placeholder,
   .recovered-timeline-text,

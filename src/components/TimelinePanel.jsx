@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 const TIMELINE_TYPE_SPEED = 22;
 const TIMELINE_ACCESS_DELAY = 520;
+const TIMELINE_PROGRESS_KEY = 'tgbTimelineUnlockedChapter';
 
 const timelineChapters = [
   {
@@ -201,10 +202,18 @@ const buildTimelineText = (chapter, fragmentIndex) => {
 
 function TimelinePanel({ onAutoScroll }) {
   const [activeChapter, setActiveChapter] = useState(null);
+  const [activeChapterIndex, setActiveChapterIndex] = useState(null);
   const [activeFragmentIndex, setActiveFragmentIndex] = useState(0);
+  const [unlockedChapterIndex, setUnlockedChapterIndex] = useState(() => {
+    const savedIndex = Number(window.localStorage.getItem(TIMELINE_PROGRESS_KEY));
+    if (!Number.isFinite(savedIndex)) return 0;
+
+    return Math.min(Math.max(savedIndex, 0), timelineChapters.length - 1);
+  });
   const [typedText, setTypedText] = useState('');
   const [isAccessing, setIsAccessing] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [lockedMessage, setLockedMessage] = useState('');
   const accessTimerRef = useRef(null);
   const typeTimerRef = useRef(null);
 
@@ -227,14 +236,25 @@ function TimelinePanel({ onAutoScroll }) {
     });
   }, [typedText, onAutoScroll]);
 
-  const typeFragment = (chapter, fragmentIndex) => {
+  const saveUnlockedChapterIndex = (chapterIndex) => {
+    const nextUnlockedIndex = Math.min(chapterIndex, timelineChapters.length - 1);
+    setUnlockedChapterIndex((currentIndex) => {
+      const highestUnlockedIndex = Math.max(currentIndex, nextUnlockedIndex);
+      window.localStorage.setItem(TIMELINE_PROGRESS_KEY, String(highestUnlockedIndex));
+      return highestUnlockedIndex;
+    });
+  };
+
+  const typeFragment = (chapter, chapterIndex, fragmentIndex) => {
     clearTimers();
     onAutoScroll?.();
     setActiveChapter(chapter);
+    setActiveChapterIndex(chapterIndex);
     setActiveFragmentIndex(fragmentIndex);
     setTypedText('');
     setIsAccessing(true);
     setIsTyping(false);
+    setLockedMessage('');
 
     accessTimerRef.current = window.setTimeout(() => {
       const fullText = buildTimelineText(chapter, fragmentIndex);
@@ -256,23 +276,55 @@ function TimelinePanel({ onAutoScroll }) {
     }, TIMELINE_ACCESS_DELAY);
   };
 
-  const handleChapterSelect = (chapter) => {
-    typeFragment(chapter, 0);
+  const handleChapterSelect = (chapter, chapterIndex) => {
+    if (chapterIndex > unlockedChapterIndex) {
+      setLockedMessage('[ARCHIVE NODE SEALED] Previous memory chain incomplete.');
+      onAutoScroll?.();
+      return;
+    }
+
+    typeFragment(chapter, chapterIndex, 0);
   };
 
   const handleNextFragment = () => {
-    if (!activeChapter) return;
+    if (!activeChapter || activeChapterIndex === null) return;
 
     const nextFragmentIndex = activeFragmentIndex + 1;
     if (nextFragmentIndex >= activeChapter.fragments.length) return;
 
     onAutoScroll?.();
-    typeFragment(activeChapter, nextFragmentIndex);
+    typeFragment(activeChapter, activeChapterIndex, nextFragmentIndex);
+  };
+
+  const handleNextChapter = () => {
+    if (activeChapterIndex === null) return;
+
+    const nextChapterIndex = activeChapterIndex + 1;
+    if (nextChapterIndex >= timelineChapters.length) return;
+
+    saveUnlockedChapterIndex(nextChapterIndex);
+    typeFragment(timelineChapters[nextChapterIndex], nextChapterIndex, 0);
+  };
+
+  const getChapterStatus = (chapterIndex) => {
+    if (chapterIndex < unlockedChapterIndex) return 'RECOVERED';
+    if (chapterIndex === unlockedChapterIndex) return 'AVAILABLE';
+    return 'LOCKED';
   };
 
   const hasNextFragment =
     activeChapter && activeFragmentIndex < activeChapter.fragments.length - 1;
   const showNextFragment = hasNextFragment && !isAccessing && !isTyping && typedText;
+  const hasNextChapter =
+    activeChapterIndex !== null &&
+    activeChapterIndex < timelineChapters.length - 1;
+  const showNextChapter =
+    activeChapter &&
+    !hasNextFragment &&
+    hasNextChapter &&
+    !isAccessing &&
+    !isTyping &&
+    typedText;
   const activeFragmentLabel = activeChapter
     ? getFragmentLabel(activeFragmentIndex, activeChapter.fragments.length)
     : '';
@@ -286,23 +338,32 @@ function TimelinePanel({ onAutoScroll }) {
       </div>
 
       <div className="recovered-timeline-list">
-        {timelineChapters.map((chapter) => (
-          <button
-            key={chapter.number}
-            className={`recovered-timeline-entry ${
-              activeChapter?.number === chapter.number ? 'active' : ''
-            }`}
-            type="button"
-            onClick={() => handleChapterSelect(chapter)}
-          >
-            <span className="recovered-timeline-number">{chapter.number}</span>
-            <span className="recovered-timeline-date">{chapter.range}</span>
-            <span className="recovered-timeline-title">{chapter.title}</span>
-          </button>
-        ))}
+        {timelineChapters.map((chapter, chapterIndex) => {
+          const chapterStatus = getChapterStatus(chapterIndex);
+
+          return (
+            <button
+              key={chapter.number}
+              className={`recovered-timeline-entry ${chapterStatus.toLowerCase()} ${
+                activeChapter?.number === chapter.number ? 'active' : ''
+              }`}
+              type="button"
+              onClick={() => handleChapterSelect(chapter, chapterIndex)}
+            >
+              <span className="recovered-timeline-number">{chapter.number}</span>
+              <span className="recovered-timeline-date">{chapter.range}</span>
+              <span className="recovered-timeline-title">{chapter.title}</span>
+              <span className="recovered-timeline-chapter-status">{chapterStatus}</span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="recovered-timeline-output" aria-live="polite">
+        {lockedMessage && (
+          <p className="recovered-timeline-status">{lockedMessage}</p>
+        )}
+
         {activeChapter && (
           <div className="recovered-timeline-progress">
             <span>{activeChapter.range} / {activeChapter.title}</span>
@@ -330,7 +391,17 @@ function TimelinePanel({ onAutoScroll }) {
             type="button"
             onClick={handleNextFragment}
           >
-            NEXT FRAGMENT
+            RECONSTRUCT NEXT FRAGMENT
+          </button>
+        )}
+
+        {showNextChapter && (
+          <button
+            className="recovered-timeline-next"
+            type="button"
+            onClick={handleNextChapter}
+          >
+            RECOVER NEXT ARCHIVE NODE
           </button>
         )}
 
