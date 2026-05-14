@@ -4,6 +4,7 @@ import WorldMap from './WorldMap';
 import MainMenuPanel from './components/MainMenuPanel';
 import SurvivorCheckInPanel from './components/SurvivorCheckInPanel';
 import WorldStatePanel from './components/WorldStatePanel';
+import TimelinePanel from './components/TimelinePanel';
 
 const introLines = [
   'Protocol was in place... Do not leave the bunker until contact is made...',
@@ -417,7 +418,7 @@ function WorldMapPanel({ survivorLocation, onSelectLocation }) {
   );
 }
 
-function TimelinePanel({ onSelectTimelineEntry }) {
+function LegacyTimelinePanel({ onSelectTimelineEntry }) {
   return (
     <div className="timeline-panel">
       <div className="timeline-header">
@@ -492,6 +493,15 @@ function App() {
   const isMobileView = window.matchMedia('(max-width: 700px)').matches;
   const currentIntroLine = introLines[introIndex] || '';
 const introEffectClass = getIntroEffectClass(currentIntroLine);
+
+  const scrollTerminalToBottom = () => {
+    const el = outputRef.current;
+    if (!el) return;
+
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+  };
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -681,12 +691,7 @@ const nextLine = setTimeout(() => {
   };
 
 useEffect(() => {
-  const el = outputRef.current;
-  if (!el) return;
-
-  requestAnimationFrame(() => {
-    el.scrollTop = el.scrollHeight;
-  });
+  scrollTerminalToBottom();
 }, [
   output,
   terminalReady,
@@ -1065,6 +1070,16 @@ runRestrictedInputResponse(trimmedInput);
       return;
     }
 
+    if (item.id === 'TIMELINE') {
+      setTimelineActive(false);
+      setCommandHistory((prev) => [
+        ...prev,
+        { type: 'user', text: `> OPEN ${item.title}` },
+        { type: 'timelineModule' }
+      ]);
+      return;
+    }
+
     setTimelineActive(false);
     setCommandHistory((prev) => [
       ...prev,
@@ -1194,7 +1209,7 @@ runRestrictedInputResponse(trimmedInput);
 
     if (command.type === 'timeline') {
       return (
-        <TimelinePanel
+        <LegacyTimelinePanel
           key={commandIndex}
           onSelectTimelineEntry={runTimelineEntry}
         />
@@ -1203,6 +1218,15 @@ runRestrictedInputResponse(trimmedInput);
 
     if (command.type === 'worldState') {
       return <WorldStatePanel key={commandIndex} />;
+    }
+
+    if (command.type === 'timelineModule') {
+      return (
+        <TimelinePanel
+          key={commandIndex}
+          onAutoScroll={scrollTerminalToBottom}
+        />
+      );
     }
 
     return (

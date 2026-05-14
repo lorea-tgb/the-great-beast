@@ -2071,6 +2071,195 @@ body {
   text-shadow: 0 0 7px rgba(155, 60, 240, 0.45);
 }
 
+/* === RECOVERED TIMELINE MODULE === */
+
+.recovered-timeline-panel {
+  position: relative;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: min(100%, 80ch);
+  overflow: hidden;
+  border: 1px solid rgba(115, 215, 255, 0.26);
+  background:
+    linear-gradient(120deg, rgba(20, 110, 150, 0.08), transparent 32%, rgba(150, 50, 235, 0.07) 72%, transparent 100%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 5px),
+    radial-gradient(circle at 18% 0%, rgba(0, 115, 150, 0.16), transparent 48%),
+    linear-gradient(180deg, rgba(4, 0, 16, 0.98), rgba(1, 0, 7, 0.98));
+  box-shadow:
+    0 0 14px rgba(80, 170, 255, 0.15),
+    inset 0 0 28px rgba(95, 0, 160, 0.12),
+    inset 0 0 80px rgba(0, 0, 0, 0.65);
+  padding: 0.85rem;
+  box-sizing: border-box;
+  animation: timelineBoot 0.85s ease-out forwards;
+}
+
+.recovered-timeline-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent, rgba(120, 220, 255, 0.06), transparent),
+    repeating-linear-gradient(90deg, rgba(180, 100, 255, 0.03) 0 1px, transparent 1px 30px);
+  opacity: 0.28;
+  mix-blend-mode: screen;
+}
+
+.recovered-timeline-header {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.4fr auto auto;
+  gap: 0.65rem;
+  align-items: center;
+  border-bottom: 1px solid rgba(115, 215, 255, 0.18);
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.7rem;
+  color: #e8d5ff;
+  font-size: 0.66rem;
+  letter-spacing: 0.11em;
+}
+
+.recovered-timeline-header span:not(:first-child) {
+  color: rgba(145, 220, 255, 0.68);
+  text-align: right;
+}
+
+.recovered-timeline-list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.34rem;
+}
+
+.recovered-timeline-entry {
+  display: grid;
+  grid-template-columns: 2.2rem 6.2rem 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+  border: 1px solid rgba(120, 205, 255, 0.14);
+  border-left-color: rgba(205, 165, 255, 0.34);
+  background:
+    linear-gradient(90deg, rgba(10, 22, 46, 0.72), rgba(42, 0, 82, 0.26), rgba(8, 0, 20, 0.76));
+  color: #d9a4ff;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  padding: 0.48rem 0.56rem;
+  text-align: left;
+  box-shadow: inset 0 0 10px rgba(80, 180, 255, 0.06);
+}
+
+.recovered-timeline-entry:hover,
+.recovered-timeline-entry.active {
+  border-color: rgba(145, 220, 255, 0.42);
+  border-left-color: rgba(245, 220, 255, 0.72);
+  color: rgba(245, 238, 255, 0.94);
+  background:
+    linear-gradient(90deg, rgba(15, 42, 72, 0.82), rgba(72, 0, 118, 0.32), rgba(10, 0, 28, 0.88));
+  box-shadow:
+    inset 0 0 12px rgba(120, 210, 255, 0.1),
+    0 0 10px rgba(120, 210, 255, 0.14);
+}
+
+.recovered-timeline-number {
+  color: rgba(245, 220, 255, 0.86);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 8px rgba(200, 120, 255, 0.45);
+}
+
+.recovered-timeline-date {
+  color: rgba(150, 222, 255, 0.78);
+  font-size: 0.62rem;
+  letter-spacing: 0.07em;
+}
+
+.recovered-timeline-title {
+  color: rgba(237, 211, 255, 0.9);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+.recovered-timeline-output {
+  position: relative;
+  z-index: 1;
+  min-height: 8.6rem;
+  margin-top: 0.72rem;
+  border-top: 1px solid rgba(115, 215, 255, 0.15);
+  padding-top: 0.65rem;
+}
+
+.recovered-timeline-progress {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+  color: rgba(145, 220, 255, 0.68);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+}
+
+.recovered-timeline-progress span:last-child {
+  color: rgba(235, 205, 255, 0.78);
+  text-align: right;
+}
+
+.recovered-timeline-status,
+.recovered-timeline-placeholder {
+  margin: 0 !important;
+  color: rgba(145, 220, 255, 0.7);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.recovered-timeline-text {
+  margin: 0;
+  color: rgba(224, 194, 255, 0.86);
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  line-height: 1.42;
+  letter-spacing: 0.02em;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  text-shadow:
+    0 0 6px rgba(150, 80, 255, 0.42),
+    0 0 10px rgba(80, 190, 255, 0.18);
+}
+
+.recovered-timeline-cursor {
+  display: inline-block;
+  width: 0.48rem;
+  height: 0.9em;
+  margin-left: 0.12rem;
+  background: rgba(185, 235, 255, 0.78);
+  box-shadow: 0 0 8px rgba(130, 220, 255, 0.72);
+  animation: blink 0.8s steps(2, end) infinite;
+  vertical-align: -0.08em;
+}
+
+.recovered-timeline-next {
+  margin-top: 0.72rem;
+  border: 1px solid rgba(145, 220, 255, 0.34);
+  background:
+    linear-gradient(90deg, rgba(12, 35, 62, 0.82), rgba(66, 0, 115, 0.34), rgba(8, 0, 22, 0.88));
+  color: rgba(235, 222, 255, 0.88);
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.11em;
+  padding: 0.46rem 0.62rem;
+  text-shadow: 0 0 7px rgba(145, 220, 255, 0.42);
+}
+
+.recovered-timeline-next:hover {
+  border-color: rgba(220, 245, 255, 0.68);
+  color: rgba(255, 248, 255, 0.96);
+  box-shadow: 0 0 10px rgba(120, 210, 255, 0.16);
+}
+
 /* === TIMELINE MODULE === */
 
 .timeline-panel {
@@ -2869,6 +3058,7 @@ body {
   .world-map-panel,
   .main-menu-panel,
   .world-state-panel,
+  .recovered-timeline-panel,
   .timeline-panel {
     width: 100%;
     padding: 0.6rem;
@@ -2904,6 +3094,44 @@ body {
   .world-state-header span:last-child,
   .world-state-value {
     text-align: left;
+  }
+
+  .recovered-timeline-header,
+  .recovered-timeline-list,
+  .recovered-timeline-entry,
+  .recovered-timeline-progress {
+    grid-template-columns: 1fr;
+  }
+
+  .recovered-timeline-header {
+    gap: 0.25rem;
+  }
+
+  .recovered-timeline-header span:not(:first-child) {
+    text-align: left;
+  }
+
+  .recovered-timeline-entry {
+    gap: 0.18rem;
+  }
+
+  .recovered-timeline-progress {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .recovered-timeline-progress span:last-child {
+    text-align: left;
+  }
+
+  .recovered-timeline-number,
+  .recovered-timeline-date,
+  .recovered-timeline-title,
+  .recovered-timeline-status,
+  .recovered-timeline-placeholder,
+  .recovered-timeline-text,
+  .recovered-timeline-next {
+    font-size: 0.6rem;
   }
 
   .terminal-input-form {
