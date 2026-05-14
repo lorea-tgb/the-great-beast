@@ -1492,6 +1492,28 @@ body {
   color: rgba(210, 150, 255, 0.62);
 }
 
+.map-image-wrapper {
+  position: relative;
+  aspect-ratio: 1448 / 1086;
+  overflow: hidden;
+  background: #05000d;
+}
+
+.map-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+.map-coordinate-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
 .world-map-click-surface {
   position: relative;
   width: 100%;
@@ -1577,6 +1599,107 @@ body {
 
 .survivor-map-marker::after {
   animation-delay: 0.55s;
+}
+
+.survivor-checkin-panel {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: min(100%, 72ch);
+  border: 1px solid rgba(210, 150, 255, 0.4);
+  background:
+    radial-gradient(circle at center, rgba(100, 0, 145, 0.2), transparent 62%),
+    linear-gradient(180deg, rgba(12, 0, 24, 0.97), rgba(4, 0, 10, 0.97));
+  box-shadow:
+    0 0 13px rgba(170, 70, 255, 0.28),
+    inset 0 0 20px rgba(135, 0, 215, 0.18);
+  padding: 0.75rem;
+  box-sizing: border-box;
+  animation: worldMapBoot 0.9s ease-out forwards;
+}
+
+.survivor-checkin-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: #f1d2ff;
+  border-bottom: 1px solid rgba(210, 150, 255, 0.24);
+  padding-bottom: 0.45rem;
+  margin-bottom: 0.55rem;
+}
+
+.survivor-checkin-text,
+.survivor-checkin-coordinates,
+.survivor-checkin-warning {
+  margin: 0.6rem 0 0 0 !important;
+  font-size: 0.75rem;
+  color: #f1d2ff;
+}
+
+.survivor-checkin-text {
+  margin: 0 0 0.65rem 0 !important;
+  color: #d9a4ff;
+  opacity: 0.86;
+}
+
+.survivor-checkin-map {
+  width: 100%;
+  aspect-ratio: 946 / 575;
+  cursor: crosshair;
+  border: 1px solid rgba(180, 90, 255, 0.38);
+  box-shadow:
+    inset 0 0 32px rgba(0, 0, 0, 0.88),
+    inset 0 0 18px rgba(130, 0, 210, 0.26),
+    0 0 10px rgba(145, 0, 255, 0.25);
+}
+
+.survivor-checkin-map::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(rgba(8, 0, 18, 0.16), rgba(3, 0, 8, 0.46));
+}
+
+.survivor-checkin-coordinates.pending {
+  color: rgba(210, 150, 255, 0.62);
+}
+
+.survivor-checkin-warning {
+  color: #ffb2f6;
+  text-shadow:
+    0 0 4px rgba(255, 140, 240, 0.9),
+    0 0 12px rgba(255, 30, 160, 0.5);
+}
+
+.survivor-checkin-confirm {
+  margin-top: 0.7rem;
+  padding: 0.56rem 0.8rem;
+  border: 1px solid rgba(235, 190, 255, 0.62);
+  background:
+    linear-gradient(90deg, rgba(48, 0, 82, 0.92), rgba(100, 0, 150, 0.62), rgba(26, 0, 50, 0.92));
+  color: #fff1ff;
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.13em;
+  cursor: pointer;
+  text-shadow: 0 0 7px rgba(245, 210, 255, 0.95);
+  box-shadow:
+    0 0 12px rgba(180, 70, 255, 0.34),
+    inset 0 0 16px rgba(225, 150, 255, 0.16);
+}
+
+.survivor-checkin-confirm:hover:not(:disabled) {
+  border-color: rgba(255, 235, 255, 0.95);
+  background:
+    linear-gradient(90deg, rgba(76, 0, 122, 0.95), rgba(140, 20, 190, 0.72), rgba(44, 0, 76, 0.95));
+}
+
+.survivor-checkin-confirm:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
 
 /* === MAIN MENU === */
