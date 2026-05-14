@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import './App.css';
 
 const introLines = [
@@ -1450,6 +1451,7 @@ runRestrictedInputResponse(trimmedInput);
           </div>
         </div>
       </div>
+      <SpeedInsights />
     </div>
   );
 }
