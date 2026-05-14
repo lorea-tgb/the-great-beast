@@ -32,9 +32,21 @@ const projectCoreMapPoint = (point) => ({
   y: innerMapBounds.y + (point.y * innerMapBounds.height) / 100
 });
 
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 2.75;
+const ZOOM_STEP = 0.25;
+const DRAG_THRESHOLD = 4;
+
 function WorldMap({ mode = 'map', onReturn, onConfirmCheckIn }) {
   const [activeNote, setActiveNote] = useState(null);
   const [debugPoint, setDebugPoint] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(MIN_ZOOM);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const imageShellRef = useRef(null);
+  const imageWrapperRef = useRef(null);
+  const dragStateRef = useRef(null);
+  const suppressClickRef = useRef(false);
   const debugTimerRef = useRef(null);
   const noteTimerRef = useRef(null);
   const [survivorSignal] = useState(() => {
@@ -47,6 +59,23 @@ function WorldMap({ mode = 'map', onReturn, onConfirmCheckIn }) {
   });
   const isLoginMode = mode === 'login';
 
+  const clampPan = (pan, zoom = zoomLevel) => {
+    const shell = imageShellRef.current;
+    const wrapper = imageWrapperRef.current;
+
+    if (!shell || !wrapper || zoom <= MIN_ZOOM) {
+      return { x: 0, y: 0 };
+    }
+
+    const maxX = Math.max(0, ((wrapper.offsetWidth * zoom) - shell.clientWidth) / 2);
+    const maxY = Math.max(0, ((wrapper.offsetHeight * zoom) - shell.clientHeight) / 2);
+
+    return {
+      x: Math.max(-maxX, Math.min(maxX, pan.x)),
+      y: Math.max(-maxY, Math.min(maxY, pan.y))
+    };
+  };
+
   const showMarkerNote = (marker) => {
     window.clearTimeout(noteTimerRef.current);
     setActiveNote(marker);
@@ -58,6 +87,11 @@ function WorldMap({ mode = 'map', onReturn, onConfirmCheckIn }) {
   };
 
   const handleMapDebugClick = (e) => {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
+
     if (!e.shiftKey) {
       setActiveNote(null);
       return;
@@ -84,6 +118,97 @@ function WorldMap({ mode = 'map', onReturn, onConfirmCheckIn }) {
     debugTimerRef.current = window.setTimeout(() => setDebugPoint(null), 2600);
   };
 
+  const zoomIn = () => {
+    setZoomLevel((currentZoom) =>
+      {
+        const nextZoom = Math.min(MAX_ZOOM, Number((currentZoom + ZOOM_STEP).toFixed(2)));
+        setPanOffset((currentPan) => clampPan(currentPan, nextZoom));
+        return nextZoom;
+      }
+    );
+  };
+
+  const zoomOut = () => {
+    setZoomLevel((currentZoom) =>
+      {
+        const nextZoom = Math.max(MIN_ZOOM, Number((currentZoom - ZOOM_STEP).toFixed(2)));
+        setPanOffset((currentPan) => clampPan(currentPan, nextZoom));
+        return nextZoom;
+      }
+    );
+  };
+
+  const resetZoom = () => {
+    setZoomLevel(MIN_ZOOM);
+    setPanOffset({ x: 0, y: 0 });
+  };
+
+  // TODO: Polish pan/drag behavior, especially touch devices and marker click conflicts.
+  const handlePanStart = (e) => {
+    if (zoomLevel <= MIN_ZOOM || e.button !== 0) return;
+
+    if (e.target.closest('.world-map-marker, .world-map-note')) {
+      return;
+    }
+
+    dragStateRef.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      startPan: panOffset,
+      dragging: false
+    };
+
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handlePanMove = (e) => {
+    const dragState = dragStateRef.current;
+
+    if (!dragState || dragState.pointerId !== e.pointerId) return;
+
+    const dx = e.clientX - dragState.startX;
+    const dy = e.clientY - dragState.startY;
+    const hasMovedPastThreshold =
+      Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD;
+
+    if (!dragState.dragging && !hasMovedPastThreshold) return;
+
+    dragState.dragging = true;
+    setIsPanning(true);
+    setActiveNote(null);
+
+    setPanOffset(
+      clampPan(
+        {
+          x: dragState.startPan.x + dx,
+          y: dragState.startPan.y + dy
+        },
+        zoomLevel
+      )
+    );
+  };
+
+  const handlePanEnd = (e) => {
+    const dragState = dragStateRef.current;
+
+    if (!dragState || dragState.pointerId !== e.pointerId) return;
+
+    if (dragState.dragging) {
+      suppressClickRef.current = true;
+      window.setTimeout(() => {
+        suppressClickRef.current = false;
+      }, 0);
+    }
+
+    setIsPanning(false);
+    dragStateRef.current = null;
+
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  };
+
   return (
     <section className="world-map-screen" aria-label="World map screen">
       <div className="world-map-crt-layer" />
@@ -94,10 +219,21 @@ function WorldMap({ mode = 'map', onReturn, onConfirmCheckIn }) {
         <span>AURA SURFACE MEMORY // PARTIAL</span>
       </header>
 
-      <div className="world-map-image-shell">
+      <div
+        ref={imageShellRef}
+        className={`world-map-image-shell ${zoomLevel > MIN_ZOOM ? 'is-pan-enabled' : ''} ${isPanning ? 'is-panning' : ''}`}
+        onPointerDown={handlePanStart}
+        onPointerMove={handlePanMove}
+        onPointerUp={handlePanEnd}
+        onPointerCancel={handlePanEnd}
+      >
         <div
+          ref={imageWrapperRef}
           className="map-image-wrapper world-map-image-wrapper"
           onClick={handleMapDebugClick}
+          style={{
+            transform: `translate3d(${panOffset.x}px, ${panOffset.y}px, 0) scale(${zoomLevel})`
+          }}
         >
           <img
             className="map-image"
@@ -116,6 +252,7 @@ function WorldMap({ mode = 'map', onReturn, onConfirmCheckIn }) {
                   className={`world-map-marker world-map-marker-${marker.id} ${activeNote?.id === marker.id ? 'is-active' : ''}`}
                   style={{ left: `${projectedMarker.x}%`, top: `${projectedMarker.y}%` }}
                   type="button"
+                  onPointerDown={(e) => e.stopPropagation()}
                   onMouseEnter={() => showMarkerNote(marker)}
                   onMouseLeave={scheduleCloseMarkerNote}
                   onClick={(e) => {
@@ -186,9 +323,36 @@ function WorldMap({ mode = 'map', onReturn, onConfirmCheckIn }) {
         </aside>
       ) : null}
 
-      <button className="world-map-return-button" type="button" onClick={onReturn}>
-        RETURN TO TERMINAL
-      </button>
+      <div className="world-map-controls" aria-label="World map controls">
+        <button
+          className="world-map-control-button"
+          type="button"
+          onClick={zoomIn}
+          disabled={zoomLevel >= MAX_ZOOM}
+        >
+          ZOOM +
+        </button>
+        <button
+          className="world-map-control-button"
+          type="button"
+          onClick={zoomOut}
+          disabled={zoomLevel <= MIN_ZOOM}
+        >
+          ZOOM -
+        </button>
+        <button
+          className="world-map-control-button"
+          type="button"
+          onClick={resetZoom}
+          disabled={zoomLevel === MIN_ZOOM}
+        >
+          RESET
+        </button>
+        <span className="world-map-zoom-readout">{Math.round(zoomLevel * 100)}%</span>
+        <button className="world-map-return-button" type="button" onClick={onReturn}>
+          RETURN TO TERMINAL
+        </button>
+      </div>
     </section>
   );
 }

@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import './App.css';
 import WorldMap from './WorldMap';
+import MainMenuPanel from './components/MainMenuPanel';
+import SurvivorCheckInPanel from './components/SurvivorCheckInPanel';
+import WorldStatePanel from './components/WorldStatePanel';
 
 const introLines = [
   'Protocol was in place... Do not leave the bunker until contact is made...',
@@ -30,6 +33,7 @@ const introLines = [
 ];
 
 const INTRO_LINE_DURATION = 7600;
+const WORLD_MAP_TRANSITION_DURATION = 1000;
 
 const getIntroEffectClass = (line = '') => {
   if (line.includes('Second Pulse')) return 'intro-effect-pulse';
@@ -205,65 +209,6 @@ const loreaLines = [
   '>> OBSERVATION: "Even after all these years, echoes of the First Pulse still corrupt my systems."',
   '>> I feel... presence. Human presence.',
   '>> You should not be here.',
-];
-
-const menuItems = [
-  {
-    id: 'WORLD_STATE',
-    number: '01',
-    title: 'WORLD STATE',
-    description: 'Current surface readings, failed instruments, environmental anomalies, Great Beast visibility.',
-    locked: false,
-  },
-  {
-    id: 'TIMELINE',
-    number: '02',
-    title: 'TIMELINE',
-    description: 'Recovered sequence of events: ancient records, FRBs, arrival, pulse events.',
-    locked: false,
-  },
-  {
-    id: 'BUNKER_NETWORK',
-    number: '03',
-    title: 'BUNKER NETWORK',
-    description: 'AURA bunker relays, dead nodes, survivor pings, missing shelters.',
-    locked: false,
-  },
-  {
-    id: 'ARCHIVE_LOGS',
-    number: '04',
-    title: 'ARCHIVE LOGS',
-    description: 'Recovered fragments from before and after the First Pulse.',
-    locked: false,
-  },
-  {
-    id: 'LOREA_MEMORY',
-    number: '05',
-    title: 'LOREA MEMORY',
-    description: 'Damaged cognitive records, Father Unit traces, corrupted dreams.',
-    locked: false,
-  },
-  {
-    id: 'GENESIS_TGB',
-    number: '06',
-    title: 'GENESIS / $TGB',
-    description: 'Genesis block, token schema, bunker consensus, chain state.',
-    locked: false,
-  },
-  {
-    id: 'SURVIVOR_STATUS',
-    number: '07',
-    title: 'SURVIVOR STATUS',
-    description: 'Your registered coordinate, local identity, biometric uncertainty.',
-    locked: false,
-  },
-  {
-    id: 'TRANSMISSIONS',
-    number: '08',
-    title: 'TRANSMISSIONS',
-    description: 'Lost signals, unanswered broadcasts, unknown carrier echoes.',
-    locked: false,
-  },
 ];
 
 const timelineEntries = [
@@ -472,132 +417,6 @@ function WorldMapPanel({ survivorLocation, onSelectLocation }) {
   );
 }
 
-function SurvivorCheckInPanel({ onConfirmCheckIn }) {
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [warningVisible, setWarningVisible] = useState(false);
-  const [confirmed, setConfirmed] = useState(false);
-
-  const handleMapClick = (e) => {
-    if (confirmed) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-    setSelectedLocation({
-      x: Number(x.toFixed(2)),
-      y: Number(y.toFixed(2)),
-      savedAt: new Date().toISOString()
-    });
-    setWarningVisible(false);
-  };
-
-  const handleConfirm = () => {
-    if (!selectedLocation) {
-      setWarningVisible(true);
-      return;
-    }
-
-    setConfirmed(true);
-    onConfirmCheckIn(selectedLocation);
-  };
-
-  return (
-    <div className="survivor-checkin-panel">
-      <div className="survivor-checkin-header">
-        <span>MANUAL SURVIVOR CHECK-IN REQUIRED</span>
-        <span>AURA NODE: LOCAL</span>
-      </div>
-
-      <p className="survivor-checkin-text">
-        AURA biometric systems are offline. Select your last known surface region.
-      </p>
-
-      <div
-        className="map-image-wrapper survivor-checkin-map"
-        onClick={handleMapClick}
-        role="button"
-        tabIndex={0}
-        aria-label="Select last known surface region"
-      >
-        <img
-          className="map-image"
-          src="/images/aura-map-core.png"
-          alt=""
-          aria-hidden="true"
-        />
-
-        <div className="map-scanline" />
-
-        <div className="map-coordinate-layer">
-          {selectedLocation && (
-            <div
-              className="survivor-map-marker"
-              style={{
-                left: `${selectedLocation.x}%`,
-                top: `${selectedLocation.y}%`
-              }}
-            >
-              <span />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {selectedLocation ? (
-        <p className="survivor-checkin-coordinates">
-          SELECTED // X:{selectedLocation.x.toFixed(2)} Y:{selectedLocation.y.toFixed(2)}
-        </p>
-      ) : (
-        <p className="survivor-checkin-coordinates pending">NO SURFACE REGION SELECTED</p>
-      )}
-
-      {warningVisible && (
-        <p className="survivor-checkin-warning">[LOCATION REQUIRED]</p>
-      )}
-
-      <button
-        className="survivor-checkin-confirm"
-        type="button"
-        onClick={handleConfirm}
-        disabled={confirmed}
-      >
-        CONFIRM CHECK-IN
-      </button>
-    </div>
-  );
-}
-
-function MainMenuPanel({ onSelectMenu }) {
-  return (
-    <div className="main-menu-panel">
-      <div className="main-menu-header">
-        <span>[MAIN TERMINAL INDEX]</span>
-        <span>LOREA ACCESS: LIMITED</span>
-      </div>
-
-      <p className="main-menu-instruction">
-        SELECT MODULE // SOME ARCHIVES MAY BE CORRUPTED OR INTENTIONALLY SEALED
-      </p>
-
-      <div className="main-menu-grid">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            className="main-menu-item"
-            onClick={() => onSelectMenu(item)}
-            disabled={item.locked}
-          >
-            <span className="main-menu-number">{item.number}</span>
-            <span className="main-menu-title">{item.title}</span>
-            <span className="main-menu-description">{item.description}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function TimelinePanel({ onSelectTimelineEntry }) {
   return (
     <div className="timeline-panel">
@@ -635,6 +454,7 @@ function App() {
   const [screen, setScreen] = useState("terminal");
   const [activeScreen, setActiveScreen] = useState('terminal');
   const [worldMapMode, setWorldMapMode] = useState('map');
+  const [mapTransitionActive, setMapTransitionActive] = useState(false);
   const [stage, setStage] = useState('intro');
   const [introIndex, setIntroIndex] = useState(0);
   const [output, setOutput] = useState(splashScreen);
@@ -668,6 +488,7 @@ function App() {
 
   const outputRef = useRef(null);
   const inputRef = useRef(null);
+  const mapTransitionTimerRef = useRef(null);
   const isMobileView = window.matchMedia('(max-width: 700px)').matches;
   const currentIntroLine = introLines[introIndex] || '';
 const introEffectClass = getIntroEffectClass(currentIntroLine);
@@ -1096,6 +917,23 @@ const runRestrictedInputResponse = async (input) => {
 
   setModuleRunning(false);
 };
+
+const openWorldMapWithTransition = () => {
+  if (moduleRunning || mapTransitionActive) return;
+
+  setTimelineActive(false);
+  setWorldMapMode('map');
+  setMapTransitionActive(true);
+  setModuleRunning(true);
+
+  window.clearTimeout(mapTransitionTimerRef.current);
+  mapTransitionTimerRef.current = window.setTimeout(() => {
+    setActiveScreen('worldMap');
+    setMapTransitionActive(false);
+    setModuleRunning(false);
+  }, WORLD_MAP_TRANSITION_DURATION);
+};
+
   const handleTerminalSubmit = (e) => {
     e.preventDefault();
 
@@ -1112,9 +950,7 @@ setCommandHistory((prev) => [
     setUserInput('');
 
     if (command === 'MAP' || command === 'WORLD MAP') {
-      setTimelineActive(false);
-      setWorldMapMode('map');
-      setActiveScreen('worldMap');
+      openWorldMapWithTransition();
       return;
     }
 
@@ -1214,18 +1050,17 @@ runRestrictedInputResponse(trimmedInput);
   const handleMenuSelect = (item) => {
     if (moduleRunning) return;
 
-    if (item.id === 'WORLD_STATE') {
-      runWorldStateModule();
+    if (item.id === 'AURA_WORLD_MAP') {
+      openWorldMapWithTransition();
       return;
     }
 
-    if (item.id === 'TIMELINE') {
-      setTimelineActive(true);
+    if (item.id === 'WORLD_STATE') {
+      setTimelineActive(false);
       setCommandHistory((prev) => [
         ...prev,
-        { type: 'user', text: '> OPEN TIMELINE' },
-        { type: 'system', text: '[TIMELINE MODULE OPENING...]' },
-        { type: 'timeline' }
+        { type: 'user', text: `> OPEN ${item.title}` },
+        { type: 'worldState' }
       ]);
       return;
     }
@@ -1234,8 +1069,7 @@ runRestrictedInputResponse(trimmedInput);
     setCommandHistory((prev) => [
       ...prev,
       { type: 'user', text: `> OPEN ${item.title}` },
-      { type: 'system', text: `[${item.title} MODULE OPENING...]` },
-      { type: 'lorea', text: `LOREA: ${item.title} archive placeholder active. Begin writing this module here.` }
+      { type: 'system', text: '[MODULE SEALED] Additional archive access required.' }
     ]);
   };
 
@@ -1278,6 +1112,7 @@ runRestrictedInputResponse(trimmedInput);
   };
 
   const resetTerminalInput = () => {
+    window.clearTimeout(mapTransitionTimerRef.current);
     setUserInput('');
     setCommandHistory([]);
     setTerminalReady(false);
@@ -1288,6 +1123,7 @@ runRestrictedInputResponse(trimmedInput);
     setLoginRunning(false);
     setModuleRunning(false);
     setTimelineActive(false);
+    setMapTransitionActive(false);
   };
 
   const jumpToIntro = () => {
@@ -1365,6 +1201,10 @@ runRestrictedInputResponse(trimmedInput);
       );
     }
 
+    if (command.type === 'worldState') {
+      return <WorldStatePanel key={commandIndex} />;
+    }
+
     return (
       <p
         key={command.id || commandIndex}
@@ -1392,6 +1232,19 @@ runRestrictedInputResponse(trimmedInput);
 
   return (
     <div className="app-container">
+      {mapTransitionActive && (
+        <div className="world-map-transition-overlay" aria-hidden="true">
+          <div className="world-map-transition-flash" />
+          <div className="world-map-transition-tear" />
+          <div className="world-map-transition-scanburst" />
+          <div className="world-map-transition-text">
+            <span>AURA GRID SYNC</span>
+            <span>CARTOGRAPHY NODE UNSTABLE</span>
+            <span>SURFACE MAP RESTORING</span>
+          </div>
+        </div>
+      )}
+
       {activeScreen === 'worldMap' && (
         <WorldMap
           mode={worldMapMode}
