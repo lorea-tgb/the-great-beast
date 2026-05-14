@@ -2106,6 +2106,56 @@ body {
   mix-blend-mode: screen;
 }
 
+.recovered-timeline-panel.unlock-glitch {
+  animation:
+    timelineBoot 0.85s ease-out forwards,
+    recoveredTimelineUnlockJitter 0.72s steps(2, end);
+}
+
+.recovered-timeline-panel.unlock-glitch.deep {
+  animation:
+    timelineBoot 0.85s ease-out forwards,
+    recoveredTimelineDeepUnlockJitter 0.95s steps(2, end);
+}
+
+.recovered-timeline-unlock-glitch {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  pointer-events: none;
+  color: rgba(235, 230, 255, 0.9);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-shadow:
+    0 0 7px rgba(220, 160, 255, 0.78),
+    0 0 16px rgba(80, 210, 255, 0.36);
+  background:
+    linear-gradient(to bottom, transparent 0 42%, rgba(220, 230, 255, 0.12) 44%, rgba(90, 210, 255, 0.18) 47%, transparent 52%),
+    radial-gradient(circle at center, rgba(170, 70, 255, 0.16), transparent 58%);
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: recoveredTimelineUnlockOverlay 0.72s steps(3, end) forwards;
+}
+
+.recovered-timeline-panel.unlock-glitch.deep .recovered-timeline-unlock-glitch {
+  color: rgba(255, 232, 255, 0.95);
+  text-shadow:
+    0 0 8px rgba(255, 185, 255, 0.92),
+    0 0 18px rgba(120, 220, 255, 0.52),
+    0 0 30px rgba(175, 70, 255, 0.42);
+  background:
+    linear-gradient(to bottom, transparent 0 34%, rgba(255, 230, 255, 0.16) 38%, rgba(110, 230, 255, 0.24) 42%, transparent 49%),
+    linear-gradient(to bottom, transparent 0 62%, rgba(190, 90, 255, 0.2) 65%, transparent 70%),
+    radial-gradient(circle at center, rgba(210, 80, 255, 0.24), transparent 62%);
+  animation: recoveredTimelineDeepUnlockOverlay 0.95s steps(4, end) forwards;
+}
+
 .recovered-timeline-header {
   position: relative;
   z-index: 1;
@@ -2295,6 +2345,50 @@ body {
   border-color: rgba(220, 245, 255, 0.68);
   color: rgba(255, 248, 255, 0.96);
   box-shadow: 0 0 10px rgba(120, 210, 255, 0.16);
+}
+
+.recovered-timeline-next.deep-memory-unseal {
+  border-color: rgba(235, 185, 255, 0.42);
+  color: rgba(255, 230, 255, 0.94);
+  background:
+    linear-gradient(90deg, rgba(40, 0, 64, 0.9), rgba(105, 0, 145, 0.38), rgba(6, 18, 34, 0.9));
+  text-shadow:
+    0 0 8px rgba(235, 180, 255, 0.5),
+    0 0 14px rgba(120, 220, 255, 0.24);
+}
+
+@keyframes recoveredTimelineUnlockJitter {
+  0%, 100% { transform: translateX(0); filter: brightness(1); }
+  18% { transform: translateX(-1px); filter: brightness(1.16); }
+  36% { transform: translateX(1px); filter: brightness(0.92); }
+  54% { transform: translateX(-0.5px); filter: brightness(1.12); }
+  72% { transform: translateX(0.5px); filter: brightness(0.96); }
+}
+
+@keyframes recoveredTimelineDeepUnlockJitter {
+  0%, 100% { transform: translateX(0); filter: brightness(1); }
+  12% { transform: translateX(-1.5px); filter: brightness(1.24) contrast(1.08); }
+  28% { transform: translateX(1px); filter: brightness(0.86) contrast(1.12); }
+  46% { transform: translateX(-1px); filter: brightness(1.18); }
+  64% { transform: translateX(1.5px); filter: brightness(0.94); }
+  82% { transform: translateX(-0.5px); filter: brightness(1.12); }
+}
+
+@keyframes recoveredTimelineUnlockOverlay {
+  0% { opacity: 0; transform: scaleY(0.98); }
+  18% { opacity: 0.92; }
+  42% { opacity: 0.3; transform: scaleY(1.02); }
+  62% { opacity: 0.72; }
+  100% { opacity: 0; transform: scaleY(1); }
+}
+
+@keyframes recoveredTimelineDeepUnlockOverlay {
+  0% { opacity: 0; transform: scaleY(0.96); }
+  14% { opacity: 1; }
+  32% { opacity: 0.28; transform: scaleY(1.04); }
+  50% { opacity: 0.86; }
+  72% { opacity: 0.36; transform: scaleY(0.99); }
+  100% { opacity: 0; transform: scaleY(1); }
 }
 
 /* === TIMELINE MODULE === */
@@ -3159,6 +3253,12 @@ body {
 
   .recovered-timeline-progress span:last-child {
     text-align: left;
+  }
+
+  .recovered-timeline-unlock-glitch {
+    padding: 0 0.8rem;
+    font-size: 0.56rem;
+    line-height: 1.35;
   }
 
   .recovered-timeline-number,

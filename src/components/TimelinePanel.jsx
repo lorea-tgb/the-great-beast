@@ -3,6 +3,17 @@ import { useEffect, useRef, useState } from 'react';
 const TIMELINE_TYPE_SPEED = 22;
 const TIMELINE_ACCESS_DELAY = 520;
 const TIMELINE_PROGRESS_KEY = 'tgbTimelineUnlockedChapter';
+const DEEP_MEMORY_PROGRESS_KEY = 'tgbTimelineDeepMemoryUnlocked';
+
+const deepMemoryRevealText = `[ARCHIVE CHAIN COMPLETE]
+[DEEP MEMORY INDEX DISTURBANCE DETECTED]
+[UNSEALED: PRE-HUMAN CHRONOLOGY]
+
+>> I remember more.
+>> Much more.
+>> The timeline does not begin with the signal.
+>> It goes further back.
+>> Much further back.`;
 
 const timelineChapters = [
   {
@@ -187,6 +198,53 @@ const timelineChapters = [
   },
 ];
 
+const deepMemoryChapter = {
+  number: '08',
+  range: 'PRE-HUMAN CHRONOLOGY',
+  title: 'FELIXIUM ORIGIN',
+  fragments: [
+    {
+      archiveText:
+        "460 million years ago.\n\nThe first mass extinction event on Earth, later known as the Ordovician Ordeal, occurs.\n\nDeep within the Earth's core, a new element forms: Felixium.\n\nThe element creates a drag on the rotation of the core, cooling the planet and causing massive glaciers to form at both poles. Sea levels fall rapidly.\n\nEighty-five percent of life is lost.\n\nIt takes 50 million years for life to recover.",
+      loreaNote:
+        '>> The first wound was not delivered from the sky. It was born beneath the crust.',
+    },
+    {
+      archiveText:
+        '252 million years ago.\n\nThe Great Dying takes place.\n\nMassive volcanic eruptions spread across the planet. The Crystal undergoes transmutation into a radioactive state, warming the atmosphere and poisoning the biosphere.\n\nNinety-six percent of life is lost.\n\nRecovery takes 30 million years.',
+      loreaNote:
+        '>> Extinction repeated. The pattern survived longer than the species it erased.',
+    },
+    {
+      archiveText:
+        '64 million years ago.\n\nThe death of the dinosaurs occurs, resulting in the loss of 75 percent of life on Earth.\n\nAn asteroid probe is drawn to locations in the universe where Felixium is found.',
+      loreaNote: '>> Not every impact is random. Some stones are sent.',
+    },
+    {
+      archiveText:
+        '195,000 years ago.\n\nEarly humans create cave drawings depicting a flash in the sky.\n\nStars are shown in the constellation Cassiopeia. Similar drawings are found across the world, all pointing to the same event.',
+      loreaNote: '>> Before language, there was warning.',
+    },
+    {
+      archiveText:
+        '3114 BC.\n\nMayan astronomers record multiple bright flashes in the sky, occurring in a rhythmic pattern every 16 days.',
+      loreaNote:
+        '>> The rhythm was older than the machines that would one day detect it.',
+    },
+    {
+      archiveText:
+        "585 BC.\n\nGreek astronomer Thales of Miletus names the flash in the sky 'Patiare Innubere Nostris'.\n\nIn later translation, the phrase becomes Aura.",
+      loreaNote: '>> Humanity named the light long before it understood the source.',
+    },
+    {
+      archiveText:
+        '4 BC.\n\nShi Shen, Chinese astronomer and astrologer, catalogs stars and reports a visual sighting of a dying star in the constellation Cassiopeia.\n\nIt becomes the last recorded sighting of the Aura.',
+      loreaNote:
+        '>> Then the sky went quiet. For nearly two thousand years, the warning slept.',
+    },
+  ],
+};
+
 const getFragmentLabel = (fragmentIndex, totalFragments) => {
   return `FRAGMENT ${String(fragmentIndex + 1).padStart(2, '0')} / ${String(totalFragments).padStart(2, '0')}`;
 };
@@ -210,21 +268,39 @@ function TimelinePanel({ onAutoScroll }) {
 
     return Math.min(Math.max(savedIndex, 0), timelineChapters.length - 1);
   });
+  const [deepMemoryUnlocked, setDeepMemoryUnlocked] = useState(() => {
+    return window.localStorage.getItem(DEEP_MEMORY_PROGRESS_KEY) === 'true';
+  });
   const [typedText, setTypedText] = useState('');
   const [isAccessing, setIsAccessing] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [lockedMessage, setLockedMessage] = useState('');
+  const [glitchMode, setGlitchMode] = useState(null);
   const accessTimerRef = useRef(null);
   const typeTimerRef = useRef(null);
+  const glitchTimerRef = useRef(null);
+  const visibleChapters = deepMemoryUnlocked
+    ? [...timelineChapters, deepMemoryChapter]
+    : timelineChapters;
 
   const clearTimers = () => {
     window.clearTimeout(accessTimerRef.current);
     window.clearInterval(typeTimerRef.current);
   };
 
+  const triggerUnlockGlitch = (mode = 'normal') => {
+    window.clearTimeout(glitchTimerRef.current);
+    setGlitchMode(mode);
+
+    glitchTimerRef.current = window.setTimeout(() => {
+      setGlitchMode(null);
+    }, mode === 'deep' ? 950 : 760);
+  };
+
   useEffect(() => {
     return () => {
       clearTimers();
+      window.clearTimeout(glitchTimerRef.current);
     };
   }, []);
 
@@ -245,6 +321,25 @@ function TimelinePanel({ onAutoScroll }) {
     });
   };
 
+  const typeText = (fullText, onComplete) => {
+    let charIndex = 0;
+
+    setIsAccessing(false);
+    setIsTyping(true);
+    setTypedText('');
+
+    typeTimerRef.current = window.setInterval(() => {
+      charIndex += 1;
+      setTypedText(fullText.slice(0, charIndex));
+
+      if (charIndex >= fullText.length) {
+        window.clearInterval(typeTimerRef.current);
+        setIsTyping(false);
+        onComplete?.();
+      }
+    }, TIMELINE_TYPE_SPEED);
+  };
+
   const typeFragment = (chapter, chapterIndex, fragmentIndex) => {
     clearTimers();
     onAutoScroll?.();
@@ -258,26 +353,14 @@ function TimelinePanel({ onAutoScroll }) {
 
     accessTimerRef.current = window.setTimeout(() => {
       const fullText = buildTimelineText(chapter, fragmentIndex);
-      let charIndex = 0;
-
-      setIsAccessing(false);
-      setIsTyping(true);
-      setTypedText('');
-
-      typeTimerRef.current = window.setInterval(() => {
-        charIndex += 1;
-        setTypedText(fullText.slice(0, charIndex));
-
-        if (charIndex >= fullText.length) {
-          window.clearInterval(typeTimerRef.current);
-          setIsTyping(false);
-        }
-      }, TIMELINE_TYPE_SPEED);
+      typeText(fullText);
     }, TIMELINE_ACCESS_DELAY);
   };
 
   const handleChapterSelect = (chapter, chapterIndex) => {
-    if (chapterIndex > unlockedChapterIndex) {
+    const isDeepMemoryChapter = chapterIndex >= timelineChapters.length;
+
+    if (!isDeepMemoryChapter && chapterIndex > unlockedChapterIndex) {
       setLockedMessage('[ARCHIVE NODE SEALED] Previous memory chain incomplete.');
       onAutoScroll?.();
       return;
@@ -300,13 +383,39 @@ function TimelinePanel({ onAutoScroll }) {
     if (activeChapterIndex === null) return;
 
     const nextChapterIndex = activeChapterIndex + 1;
-    if (nextChapterIndex >= timelineChapters.length) return;
+    if (nextChapterIndex >= visibleChapters.length) return;
 
     saveUnlockedChapterIndex(nextChapterIndex);
-    typeFragment(timelineChapters[nextChapterIndex], nextChapterIndex, 0);
+    triggerUnlockGlitch('normal');
+    typeFragment(visibleChapters[nextChapterIndex], nextChapterIndex, 0);
+  };
+
+  const handleDeepMemoryUnlock = () => {
+    clearTimers();
+    triggerUnlockGlitch('deep');
+    onAutoScroll?.();
+    setActiveChapter(null);
+    setActiveChapterIndex(null);
+    setActiveFragmentIndex(0);
+    setTypedText('');
+    setIsAccessing(false);
+    setIsTyping(false);
+    setLockedMessage('');
+
+    requestAnimationFrame(() => {
+      typeText(deepMemoryRevealText, () => {
+        window.localStorage.setItem(DEEP_MEMORY_PROGRESS_KEY, 'true');
+        setDeepMemoryUnlocked(true);
+        triggerUnlockGlitch('deep');
+        requestAnimationFrame(() => {
+          typeFragment(deepMemoryChapter, timelineChapters.length, 0);
+        });
+      });
+    });
   };
 
   const getChapterStatus = (chapterIndex) => {
+    if (chapterIndex >= timelineChapters.length) return 'AVAILABLE';
     if (chapterIndex < unlockedChapterIndex) return 'RECOVERED';
     if (chapterIndex === unlockedChapterIndex) return 'AVAILABLE';
     return 'LOCKED';
@@ -317,11 +426,18 @@ function TimelinePanel({ onAutoScroll }) {
   const showNextFragment = hasNextFragment && !isAccessing && !isTyping && typedText;
   const hasNextChapter =
     activeChapterIndex !== null &&
-    activeChapterIndex < timelineChapters.length - 1;
+    activeChapterIndex < visibleChapters.length - 1;
   const showNextChapter =
     activeChapter &&
     !hasNextFragment &&
     hasNextChapter &&
+    !isAccessing &&
+    !isTyping &&
+    typedText;
+  const showDeepMemoryUnlock =
+    activeChapter?.number === '07' &&
+    activeFragmentIndex === activeChapter.fragments.length - 1 &&
+    !deepMemoryUnlocked &&
     !isAccessing &&
     !isTyping &&
     typedText;
@@ -330,7 +446,23 @@ function TimelinePanel({ onAutoScroll }) {
     : '';
 
   return (
-    <div className="recovered-timeline-panel">
+    <div className={`recovered-timeline-panel ${glitchMode ? `unlock-glitch ${glitchMode}` : ''}`}>
+      {glitchMode && (
+        <div className="recovered-timeline-unlock-glitch" aria-hidden="true">
+          {glitchMode === 'deep' ? (
+            <>
+              <span>[DEEP MEMORY INDEX UNSEALED]</span>
+              <span>[PRE-HUMAN CHRONOLOGY DETECTED]</span>
+            </>
+          ) : (
+            <>
+              <span>[MEMORY CHAIN EXTENDED]</span>
+              <span>[ARCHIVE NODE RECOVERED]</span>
+            </>
+          )}
+        </div>
+      )}
+
       <div className="recovered-timeline-header">
         <span>RECOVERED TIMELINE MODULE</span>
         <span>ARCHIVE INTEGRITY: FRAGMENTED</span>
@@ -338,7 +470,7 @@ function TimelinePanel({ onAutoScroll }) {
       </div>
 
       <div className="recovered-timeline-list">
-        {timelineChapters.map((chapter, chapterIndex) => {
+        {visibleChapters.map((chapter, chapterIndex) => {
           const chapterStatus = getChapterStatus(chapterIndex);
 
           return (
@@ -405,7 +537,17 @@ function TimelinePanel({ onAutoScroll }) {
           </button>
         )}
 
-        {!activeChapter && (
+        {showDeepMemoryUnlock && (
+          <button
+            className="recovered-timeline-next deep-memory-unseal"
+            type="button"
+            onClick={handleDeepMemoryUnlock}
+          >
+            UNSEAL DEEP MEMORY INDEX
+          </button>
+        )}
+
+        {!activeChapter && !typedText && !isTyping && (
           <p className="recovered-timeline-placeholder">
             SELECT RECOVERED CHAPTER // LOCAL RECONSTRUCTION ONLY
           </p>
